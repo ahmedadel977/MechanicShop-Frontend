@@ -22,16 +22,16 @@ cd MechanicShop-Frontend
 Copy-Item .env.example .env.local
 ```
 
-يستخدم Vite افتراضيًا وكيلًا محليًا إلى `http://localhost:5106`، وهو عنوان HTTP الموجود في إعداد تشغيل API الحالي. هذا يمرر طلبات الواجهة عبر نفس الأصل ويتجنب إعداد CORS للتطوير. إذا كان API يعمل على عنوان آخر، عدّل `VITE_API_PROXY_TARGET` في `.env.local`، مثل:
+يتصل الفرونت مباشرة بالباك إند عبر HTTPS على `https://localhost:7169`. أصول Vite المحلية على المنفذين 5173 و5174 مضافة إلى CORS. جهّز شهادة التطوير قبل أول تشغيل:
 
-```dotenv
-VITE_API_PROXY_TARGET=http://localhost:5106
+```powershell
+dotnet dev-certs https --trust
 ```
 
 شغّل API في نافذة PowerShell ثانية من نسخة الباك إند:
 
 ```powershell
-dotnet run --project src/MechanicShop.Api --launch-profile http
+dotnet run --project src/MechanicShop.Api --launch-profile https
 ```
 
 ثم ثبّت حزم الواجهة وشغّل خادم التطوير:
@@ -53,8 +53,9 @@ pnpm approve-builds
 
 ## إعدادات الاتصال
 
-- في التطوير يمرر Vite `/api` و`/identity` و`/health` و`/hubs` إلى `VITE_API_PROXY_TARGET`.
-- في النشر، اضبط `VITE_API_URL` إذا كان المتصفح يستطيع الوصول مباشرة إلى API؛ حينها يجب أن يسمح الخادم بأصل الواجهة في CORS.
+- يرسل المتصفح طلبات API مباشرة إلى `https://localhost:7169`، ويستخدم SignalR بروكسي Vite إلى عنوان HTTPS نفسه.
+- أصول التطوير المسموح بها في الباك إند هي `http://localhost` و`https://localhost` على المنفذين 5173 و5174.
+- عند تغيير عنوان API، حدّث `VITE_API_URL` و`VITE_API_PROXY_TARGET` في `.env.local`، وأضف أصل الواجهة الدقيق إلى `AppSettings:AllowedOrigins`.
 - لا ترفع `.env.local` أو تضع كلمات مرور/أسرارًا فيه. الملف مخصص لإعداد جهازك.
 - يمكن إيقاف خادم التطوير بـ `Ctrl+C`.
 
