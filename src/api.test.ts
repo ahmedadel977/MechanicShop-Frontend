@@ -68,7 +68,6 @@ describe('backend endpoint coverage',()=>{
   })
   it('surfaces the backend RowVersion conflict with a refresh instruction',()=>{
     const error={isAxiosError:true,response:{status:409,data:{title:'Conflict'}}} as AxiosError
-    expect(apiErrorMessage(error)).toContain('تعارض')
+    expect(apiErrorMessage(error)).toContain('conflict')
   })
 })
-

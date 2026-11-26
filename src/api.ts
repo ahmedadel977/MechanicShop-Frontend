@@ -46,20 +46,22 @@ api.interceptors.response.use(r => r, async (error: AxiosError) => {
   throw error
 })
 export const apiErrorMessage = (error: unknown) => {
-  if (!axios.isAxiosError(error)) return error instanceof Error ? error.message : 'حدث خطأ غير متوقع.'
-  if (error.response?.status === 409) return 'تعارض في التعديل: تغيرت البيانات على الخادم. حدّث البيانات وحاول مجددًا.'
+  if (!axios.isAxiosError(error)) return error instanceof Error ? error.message : 'An unexpected error occurred.'
   const data = error.response?.data as { detail?: string; title?: string; errors?: Record<string, string[]> } | undefined
   if (data?.errors) return Object.values(data.errors).flat().join(' · ')
+  if (error.response?.status === 409 && data?.title?.toLowerCase().includes('modified by another user')) {
+    return 'The work order changed on the server. Refresh it and try again.'
+  }
   if (data?.detail || data?.title) return [data.title, data.detail].filter(Boolean).join(': ')
-  if (error.response?.status === 401) return 'انتهت الجلسة أو بيانات الدخول غير صحيحة.'
-  if (error.response?.status === 403) return 'ليست لديك صلاحية لتنفيذ هذا الإجراء.'
-  return error.message || 'تعذر الاتصال بالخادم.'
+  if (error.response?.status === 401) return 'Your session expired or sign-in details are incorrect.'
+  if (error.response?.status === 403) return 'You are not authorized to perform this action.'
+  return error.message || 'Could not connect to the server.'
 }
 export const isConcurrencyConflict = (error: unknown) => axios.isAxiosError(error) && error.response?.status === 409
 const v1 = '/api/v1.0'
 export const authApi = {
   login: async (email: string, password: string) => { const { data } = await api.post<Tokens>('/identity/token/generate', { email, password }); saveTokens(data); return data },
-  refresh: async () => { const t = getTokens(); if (!t) throw new Error('لا توجد جلسة نشطة.'); const { data } = await api.post<Tokens>('/identity/token/refresh-token', { refreshToken: t.refreshToken, expiredAccessToken: t.accessToken }); saveTokens(data); return data },
+  refresh: async () => { const t = getTokens(); if (!t) throw new Error('There is no active session.'); const { data } = await api.post<Tokens>('/identity/token/refresh-token', { refreshToken: t.refreshToken, expiredAccessToken: t.accessToken }); saveTokens(data); return data },
   logout: async () => { try { await api.post('/identity/logout') } finally { saveTokens(null) } },
   changePassword: async (currentPassword: string, newPassword: string) => { await api.post('/identity/change-password', { currentPassword, newPassword }) },
   currentUser: async () => (await api.get<CurrentUser>('/identity/current-user/claims')).data,
