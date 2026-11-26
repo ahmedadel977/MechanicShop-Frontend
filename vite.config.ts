@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '')
-  const target = env.VITE_API_PROXY_TARGET || 'http://localhost:5106'
-  const proxy = { target, changeOrigin: true }
+  const target = env.VITE_API_PROXY_TARGET || 'https://localhost:7169'
+  const proxy = { target, changeOrigin: true, secure: false }
   return {
     plugins: [react(), tailwindcss()],
     server: { proxy: {
