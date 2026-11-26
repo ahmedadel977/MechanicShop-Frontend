@@ -17,7 +17,7 @@ export type Part = { partId?: string; name: string; cost: number; quantity: numb
 export type RepairTask = { repairTaskId: string; name: string; estimatedDurationInMins: number; laborCost: number; totalCost: number; parts: Part[] }
 export type OrderState = 0 | 1 | 2 | 3
 export type Spot = 0 | 1 | 2 | 3
-export type WorkOrder = { workOrderId: string; branchId: string; rowVersion: string; invoiceId?: string | null; vehicle?: Vehicle | null; customer?: string | null; labor?: string | null; state: OrderState; spot: Spot; startAtUtc: string; endAtUtc: string; repairTasks: RepairTask[] | string[]; totalPartCost?: number; totalLaborCost?: number; totalCost?: number; totalDurationInMins?: number; createdAt?: string }
+export type WorkOrder = { workOrderId: string; branchId: string; rowVersion: string; invoiceId?: string | null; vehicle?: Vehicle | null; customer?: string | null; labor?: Labor | null; state: OrderState; spot: Spot; startAtUtc: string; endAtUtc: string; repairTasks: RepairTask[] | string[]; totalPartCost?: number; totalLaborCost?: number; totalCost?: number; totalDurationInMins?: number; createdAt?: string }
 export type Page<T> = { pageNumber: number; pageSize: number; totalPages: number; totalCount: number; items: T[] }
 export type WorkOrderFilters = { page?: number; pageSize?: number; searchTerm?: string; sortColumn?: string; sortDirection?: string; state?: OrderState; vehicleId?: string; laborId?: string; startDateFrom?: string; startDateTo?: string; endDateFrom?: string; endDateTo?: string; spot?: Spot }
 export type Stats = { date: string; total: number; scheduled: number; inProgress: number; completed: number; cancelled: number; totalRevenue: number; totalPartsCost: number; totalLaborCost: number; netProfit: number; profitMargin: number; completionRate: number; averageRevenuePerOrder: number; uniqueVehicles: number; uniqueCustomers: number }
@@ -113,4 +113,3 @@ export const workOrdersApi = {
 }
 export const settingsApi = { operatingHours: async () => (await api.get<OperatingHours>('/api/settings/operating-hours')).data }
 export const healthApi = { check: async () => (await api.get<HealthReport>('/health')).data }
-
