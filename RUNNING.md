@@ -22,10 +22,10 @@ cd MechanicShop-Frontend
 Copy-Item .env.example .env.local
 ```
 
-القيمة الافتراضية في `.env.example` هي `http://localhost:5106`، وهو عنوان HTTP الموجود في إعداد تشغيل API الحالي. إذا كان الخادم على عنوان آخر، عدّل `VITE_API_URL` في `.env.local`، مثل:
+يستخدم Vite افتراضيًا وكيلًا محليًا إلى `http://localhost:5106`، وهو عنوان HTTP الموجود في إعداد تشغيل API الحالي. هذا يمرر طلبات الواجهة عبر نفس الأصل ويتجنب إعداد CORS للتطوير. إذا كان API يعمل على عنوان آخر، عدّل `VITE_API_PROXY_TARGET` في `.env.local`، مثل:
 
 ```dotenv
-VITE_API_URL=http://localhost:5106
+VITE_API_PROXY_TARGET=http://localhost:5106
 ```
 
 شغّل API في نافذة PowerShell ثانية من نسخة الباك إند:
@@ -53,8 +53,8 @@ pnpm approve-builds
 
 ## إعدادات الاتصال
 
-- عنوان API يقرأ من `VITE_API_URL` وقت تشغيل Vite.
-- يجب أن يسمح الخادم بطلبات CORS من `http://localhost:5173` إذا كان تشغيل الواجهة والخادم على أصلين مختلفين.
+- في التطوير يمرر Vite `/api` و`/identity` و`/health` و`/hubs` إلى `VITE_API_PROXY_TARGET`.
+- في النشر، اضبط `VITE_API_URL` إذا كان المتصفح يستطيع الوصول مباشرة إلى API؛ حينها يجب أن يسمح الخادم بأصل الواجهة في CORS.
 - لا ترفع `.env.local` أو تضع كلمات مرور/أسرارًا فيه. الملف مخصص لإعداد جهازك.
 - يمكن إيقاف خادم التطوير بـ `Ctrl+C`.
 
