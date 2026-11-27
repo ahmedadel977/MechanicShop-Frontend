@@ -88,7 +88,7 @@ export const employeesApi = {
   createBranchManager: async (data: { firstName: string; lastName: string; email: string; password: string; branchId: string }) => (await api.post<EmployeeAccount>(`${v1}/employees/branch-managers`, data)).data,
 }
 export const laborsApi = { list: async () => (await api.get<Labor[]>(`${v1}/labors`)).data }
-export const dashboardApi = { stats: async (date: string) => (await api.get<Stats>(`${v1}/dashboard/stats`, { params: { date } })).data }
+export const dashboardApi = { stats: async (fromUtc: string, toUtc: string) => (await api.get<Stats>(`${v1}/dashboard/stats`, { params: { fromUtc, toUtc } })).data }
 export const repairTasksApi = {
   list: async () => (await api.get<RepairTask[]>(`${v1}/repair-tasks`)).data,
   byId: async (id: string) => (await api.get<RepairTask>(`${v1}/repair-tasks/${id}`)).data,
@@ -111,7 +111,7 @@ export const workOrdersApi = {
   updateState: async (id: string, state: OrderState, rowVersion: string) => { await api.put(`${v1}/workorders/${id}/state`, { state, rowVersion }) },
   updateRepairTasks: async (id: string, repairTaskIds: string[], rowVersion: string) => { await api.put(`${v1}/workorders/${id}/repair-task`, { repairTaskIds, rowVersion }) },
   delete: async (id: string, rowVersion: string) => { await api.delete(`${v1}/workorders/${id}`, { headers: { 'If-Match': `\"${rowVersion}\"` } }) },
-  schedule: async (date: string, laborId?: string, timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo') => (await api.get<Schedule>(`${v1}/workorders/schedule/${date}`, { params: laborId ? { laborId } : undefined, headers: { 'X-TimeZone': timeZone } })).data,
+  schedule: async (date: string, laborId?: string, timeZone = 'Africa/Cairo') => (await api.get<Schedule>(`${v1}/workorders/schedule/${date}`, { params: laborId ? { laborId } : undefined, headers: { 'X-TimeZone': timeZone } })).data,
 }
 export const settingsApi = { operatingHours: async () => (await api.get<OperatingHours>('/api/settings/operating-hours')).data }
 export const healthApi = { check: async () => (await api.get<HealthReport>('/health')).data }

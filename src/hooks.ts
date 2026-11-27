@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authApi, branchesApi, customersApi, dashboardApi, employeesApi, healthApi, invoicesApi, laborsApi, repairTasksApi, settingsApi, workOrdersApi, type AccessScope, type CustomerInput, type OrderState, type RepairTask, type Spot, type WorkOrderFilters } from './api'
+import { getCairoUtcDayRange } from './timezone'
 
 const useRefresh = (...keys: string[]) => { const qc=useQueryClient(); return () => keys.forEach(key=>void qc.invalidateQueries({queryKey:[key]})) }
 export const useCurrentUser = (enabled=true) => useQuery({queryKey:['me'],queryFn:authApi.currentUser,enabled,retry:false,staleTime:300_000})
@@ -23,7 +24,7 @@ export const useDeleteCustomer = () => {const refresh=useRefresh('customers');re
 export const useCreateLabor = () => {const refresh=useRefresh('labors','branchEmployees');return useMutation({mutationFn:employeesApi.createLabor,onSuccess:refresh})}
 export const useCreateBranchManager = () => {const refresh=useRefresh('branchEmployees');return useMutation({mutationFn:employeesApi.createBranchManager,onSuccess:refresh})}
 export const useLabors = () => useQuery({queryKey:['labors'],queryFn:laborsApi.list})
-export const useDashboardStats = (date:string) => useQuery({queryKey:['stats',date],queryFn:()=>dashboardApi.stats(date)})
+export const useDashboardStats = (date:string) => useQuery({queryKey:['stats',date],queryFn:()=>{const{fromUtc,toUtc}=getCairoUtcDayRange(date);return dashboardApi.stats(fromUtc,toUtc)},refetchInterval:30_000,refetchOnWindowFocus:true})
 export const useRepairTasks = () => useQuery({queryKey:['repairTasks'],queryFn:repairTasksApi.list})
 export const useRepairTask = (id?:string) => useQuery({queryKey:['repairTask',id],queryFn:()=>repairTasksApi.byId(id!),enabled:Boolean(id)})
 export const useCreateRepairTask = () => {const refresh=useRefresh('repairTasks');return useMutation({mutationFn:repairTasksApi.create,onSuccess:refresh})}

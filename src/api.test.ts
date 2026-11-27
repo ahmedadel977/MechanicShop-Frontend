@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { AxiosHeaders, type AxiosAdapter, type AxiosError } from 'axios'
 import { api, apiErrorMessage, authApi, branchesApi, customersApi, dashboardApi, employeesApi, healthApi, invoicesApi, laborsApi, repairTasksApi, settingsApi, workOrdersApi } from './api'
+import { getCairoUtcDayRange } from './timezone'
 
 type Seen={method:string;url:string;headers:Record<string,unknown>;data:unknown}
 const id='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
@@ -35,7 +36,9 @@ describe('backend endpoint coverage',()=>{
     await customersApi.create(customer); await customersApi.update(id,customer); await customersApi.delete(id)
     await employeesApi.createLabor({firstName:'A',lastName:'Tech',email:'a@example.com',password:'password',branchId:id})
     await employeesApi.createBranchManager({firstName:'B',lastName:'Manager',email:'b@example.com',password:'password',branchId:id})
-    await laborsApi.list(); await dashboardApi.stats('2026-11-26')
+    await laborsApi.list()
+    const statsRange = getCairoUtcDayRange('2026-11-26')
+    await dashboardApi.stats(statsRange.fromUtc, statsRange.toUtc)
 
     const task={name:'Oil change',laborCost:400,estimatedDurationInMins:60,parts:[{name:'Oil',cost:500,quantity:1}]}
     await repairTasksApi.list(); await repairTasksApi.byId(id); await repairTasksApi.create(task); await repairTasksApi.update(id,task); await repairTasksApi.delete(id)

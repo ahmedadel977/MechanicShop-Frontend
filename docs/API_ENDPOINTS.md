@@ -49,7 +49,7 @@
 
 | الطريقة والمسار | خدمة الواجهة | React Query | موضع الاستخدام |
 |---|---|---|---|
-| `GET /api/v1.0/dashboard/stats?date=...` | `dashboardApi.stats` | `useDashboardStats` | مؤشرات اليوم ومخطط توزيع الحالات |
+| `GET /api/v1.0/dashboard/stats?fromUtc=...&toUtc=...` | `dashboardApi.stats` | `useDashboardStats` | مؤشرات اليوم ومخطط توزيع الحالات؛ يحوّل التطبيق نطاق يوم القاهرة إلى UTC قبل الإرسال |
 
 ## أوامر الشغل والجدول
 
